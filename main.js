@@ -9,7 +9,7 @@ import {
 import Model from "/tshirt.glb?url";
 import Texture from "/donut-base2.png";
 
-let model;
+let model, canvas;
 let rotation = 0;
 let dragging;
 let lastX;
@@ -76,11 +76,11 @@ async function main() {
   scene.add(aLight);
 
   // 2D text
-  const labelRenderer = new CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.top = "0px";
-  document.body.appendChild(labelRenderer.domElement);
+  const css2DRenderer = new CSS2DRenderer();
+  css2DRenderer.setSize(window.innerWidth, window.innerHeight);
+  css2DRenderer.domElement.style.position = "absolute";
+  css2DRenderer.domElement.style.top = "0px";
+  document.body.appendChild(css2DRenderer.domElement);
 
   // Load glb model
   const loader = new GLTFLoader();
@@ -91,23 +91,36 @@ async function main() {
       const group = gltf.scene;
       window.group = group;
       model = group.children[0];
-      const texture = new THREE.TextureLoader().load(Texture);
-
-      model.material.map = texture;
-      model.material.needsUpdate = true;
-
-      model.layers.enableAll();
-
-      const modelDiv = document.createElement("div");
-      modelDiv.className = "label";
-      modelDiv.textContent = "Page Fly";
-      modelDiv.style.backgroundColor = "transparent";
-
-      const modelLabel = new CSS2DObject(modelDiv);
-      modelLabel.position.set(0, 0.2, 0);
-      modelLabel.center.set(0, 2);
-      model.add(modelLabel);
-      modelLabel.layers.set(0);
+      canvas = document.createElement("canvas");
+      canvas.className = "canvas-editor";
+      canvas.style.background = "white";
+      canvas.style.width = "500px";
+      canvas.style.height = "500px";
+      const img = new Image();
+      const ctx = canvas.getContext("2d");
+      img.src = Texture;
+      img.onload = () => {
+        ctx.fillStyle = "#09f";
+        ctx.drawImage(img, 0, 0);
+        ctx.font = "40pt Calibri";
+        ctx.fillText("My TEXT!", 20, 100);
+        ctx.beginPath();
+        ctx.moveTo(30, 96);
+        ctx.lineTo(70, 66);
+        ctx.lineTo(103, 76);
+        ctx.lineTo(170, 15);
+        ctx.stroke();
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        const material = new THREE.MeshPhongMaterial({map: texture});
+        model.material = material;
+      };
+     
+      const canvas2D = new CSS2DObject(canvas);
+      canvas2D.position.set(0, 0, 0);
+      canvas2D.center.set(-0.5, 0.5);
+      model.add(canvas2D);
+      canvas2D.layers.set(0);
 
       scene.add(group);
       renderer.render(scene, camera);
@@ -115,13 +128,13 @@ async function main() {
       function animate() {
         model.rotation.set(model.rotation.x, 0, rotation);
         const elapsed = clock.getElapsedTime();
-        modelLabel.position.set(
-          Math.sin(elapsed/2) / 10,
-          modelLabel.position.y,
-          Math.cos(elapsed/2) / 10
-        );
+        // modelLabel.position.set(
+        //   Math.sin(elapsed/2) / 10,
+        //   modelLabel.position.y,
+        //   Math.cos(elapsed/2) / 10
+        // );
         renderer.render(scene, camera);
-        labelRenderer.render(scene, camera);
+        css2DRenderer.render(scene, camera);
         controls.update();
         requestAnimationFrame(animate);
       }
@@ -143,7 +156,7 @@ async function main() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    css2DRenderer.setSize(window.innerWidth, window.innerHeight);
   }
 
   window.addEventListener("resize", onWindowResize);
