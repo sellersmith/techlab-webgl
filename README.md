@@ -9,3 +9,6 @@
 
 - Add text at Front Top, Front Bottom, Back Top, Back Bottom
 
+## V2
+
+- Change position of text 

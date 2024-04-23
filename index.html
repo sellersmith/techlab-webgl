@@ -16,16 +16,19 @@
           <canvas id="threejsCanvas"/>
         </div>
         <div style="display: flex; flex-direction: column;">
-          <label for="color">Front Top</label>
+          <label for="color">Color</label>
           <input type="color" name="color">
-          <label for="front-top">Front Top</label>
+          <label for="front-top">Front Text</label>
           <input name="front-top">
-          <label for="front-bottom">Front Bottom</label>
-          <input name="front-bottom">
-          <label for="back-top">Back Top</label>
-          <input name="back-top">
-          <label for="back-bottom">Back Bottom</label>
-          <input name="back-bottom">
+          <label for="offset-top">Offset Top</label>
+          <input name="offset-top" type="range" min="0" max="100" value="40">
+          <label for="offset-left">Offset Left</label>
+          <input name="offset-left" type="range" min="0" max="100" value="50">
+        
+          <label for="rect-offset-top">Rect Offset Top</label>
+          <input name="rect-offset-top" type="range" min="0" max="100" value="40">
+          <label for="rect-offset-left">Rect Offset Left</label>
+          <input name="rect-offset-left" type="range" min="0" max="100" value="50">
         </div>
       </div>
     <script type="module" src="/main.js"></script>
