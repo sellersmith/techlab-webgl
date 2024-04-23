@@ -11,6 +11,23 @@
   </head>
   <body>
     <!-- <image id="myImage"  src="/checker.png" /> -->
+      <div style="display: flex;">
+        <div id="canvasContainer" style="width: 80vw; height: 100vh;">
+          <canvas id="threejsCanvas"/>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <label for="color">Front Top</label>
+          <input type="color" name="color">
+          <label for="front-top">Front Top</label>
+          <input name="front-top">
+          <label for="front-bottom">Front Bottom</label>
+          <input name="front-bottom">
+          <label for="back-top">Back Top</label>
+          <input name="back-top">
+          <label for="back-bottom">Back Bottom</label>
+          <input name="back-bottom">
+        </div>
+      </div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>

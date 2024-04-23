@@ -7,10 +7,17 @@ import {
 import Model from "/tshirt.glb?url";
 import TextureImage from "/checker.png";
 
-let model, canvas, camera, renderer, scene;
-let rotation = 0;
-let dragging;
-let lastX;
+let model, 
+    canvas,
+    canvasFront,
+    canvasBack,
+    camera, 
+    renderer,
+    scene,
+    rotation = 0,
+    dragging,
+    lastX,
+    inputs = {};
 
 //
 // Event Listeners
@@ -31,18 +38,31 @@ addEventListener("mouseup", (e) => {
   dragging = false;
 });
 
-addEventListener("resize", function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+// addEventListener("resize", function onWindowResize() {
+//   camera.aspect = window.innerWidth / window.innerHeight;
+//   camera.updateProjectionMatrix();
+//   renderer.setSize(window.innerWidth, window.innerHeight);
+// });
+
+addEventListener('change', e => {
+  inputs[e.target.getAttribute('name')] = e.target.value
+  clearCanvas(canvasFront, 1000, 1000)
+  drawTextOnCanvas(canvasFront, inputs['front-top'], inputs['front-bottom'])
+  drawTextOnCanvas(canvasBack, inputs['back-top'], inputs['back-bottom'])
+  updateMaterial(canvas, model)
+}, true)
 
 
-async function main() {
+//
+// Main
+//
+
+!async function main() {
   //RENDERER
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  const container = document.getElementById("canvasContainer");
+  const threejsCanvas = document.getElementById("threejsCanvas");
+  renderer = new THREE.WebGLRenderer({ antialias: true, canvas: threejsCanvas });
+  renderer.setSize(container.clientWidth, container.clientHeight);
 
   // INIT SCENE
   scene = new THREE.Scene();
@@ -50,12 +70,13 @@ async function main() {
 
   // CAMERA
   camera = (window.camera = new THREE.PerspectiveCamera(
-    75,
+    15,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
   ));
-  camera.position.set(0, 0, 0.4);
+  camera.aspect = 500 / 500;
+  camera.position.set(0, 0, 1);
 
   //Light
   const {aLight, dLight} = createLights()
@@ -68,17 +89,21 @@ async function main() {
   model = group.children[0];
       
   canvas = createCanvas(1024, 1024)
+  canvasFront = createCanvas(1000, 1000)
+  canvasBack = createCanvas(1000, 1000)
 
-  const img = new Image();
-  const ctx = canvas.getContext("2d");
-  window.ctx = ctx
-  img.src = TextureImage;
+  canvasFront.style.background = 'red'
+  canvasBack.style.background = 'green'
+
+  // const img = new Image();
+  // const ctx = canvas.getContext("2d");
+  // img.src = TextureImage;
 
   
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0);
-    updateMaterial(canvas, model)
-  };
+  // img.onload = () => {
+  //   ctx.drawImage(img, 0, 0);
+  //   updateMaterial(canvas, model)
+  // };
 
   window.model = model
 
@@ -90,18 +115,39 @@ async function main() {
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   })
-
-  
-
- 
-  // animate();
-}
-
-main();
+  drawOnMainCanvas()
+  updateMaterial(canvas, model)
+}()
 
 
 
 // Utilities functions
+
+function clearCanvas(canvas, w, h) {
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, w, h)
+}
+
+function drawTextOnCanvas(canvas, text1, text2) {
+  const ctx = canvas.getContext('2d')
+  ctx.font = "bold 100px Arial";
+  ctx.textAlign = 'center'
+  ctx.fillText(text1 || '', canvas.width / 2, 200);
+  ctx.fillText(text2 || '', canvas.width / 2, 800);
+  drawOnMainCanvas()
+}
+
+function drawOnMainCanvas() {
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, 1024, 1024)
+  ctx.rect(0, 0, 1024, 1024);
+  ctx.fillStyle = inputs['color'] || 'white';
+  ctx.fill();
+
+  ctx.drawImage(canvasFront, 704, 256, 256, 256)
+  ctx.drawImage(canvasBack, 320, 256, 256, 256)
+
+}
 
 function loadObject(url) {
   return new Promise((resolve, reject) => {
