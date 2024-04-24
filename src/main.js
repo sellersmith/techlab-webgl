@@ -1,41 +1,98 @@
 import {
   BoxGeometry,
-  MeshPhongMaterial,
   Mesh,
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
-  Color,
   AmbientLight,
   DirectionalLight,
   HemisphereLight,
+  Group,
+  Raycaster,
+  Vector2,
+  MeshBasicMaterial,
 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import {
+  CSS3DRenderer,
+} from "three/addons/renderers/CSS3DRenderer.js";
 
-const { camera, scene, renderer } = createScene();
+const { camera, scene, controls, css3DRenderer, renderer } = createScene();
+const { aLight, dLight, hLight } = createLight();
+scene.add(aLight);
+scene.add(dLight);
+scene.add(hLight);
+const raycaster = new Raycaster();
+const pointer = new Vector2();
+const objects = [];
+let hoveredMesh = {}
+
+const SPEED = 0.01,
+      MAX_HEIGHT = 5,
+      MIN_HEIGHT = 0
 
 async function main() {
-  const { aLight, dLight, hLight } = createLight();
-  scene.add(aLight);
-  scene.add(dLight);
-  scene.add(hLight);
+  const group = new Group();
+  // group.position.z = Math.PI;
 
-  const geometry = new BoxGeometry(2, 2, 2);
-  const material = new MeshPhongMaterial({ color: 0xffff });
-  const cube = new Mesh(geometry, material);
-  scene.add(cube);
+ const boxes = []
+ const GAP = 1.5
+//  const array = Array.from(() =)
+  for(let x = 0; x < 10; x++){
+    for(let y = 0; y < 10; y++){
+      const geometry = new BoxGeometry( 1, 1, 1)
+      const color  = `#${Math.round(255/10*x).toString(16).padStart(2, '0')}${Math.round(255/10*y).toString(16).padStart(2, '0')}00`
+      console.log(color)
+      const material = new MeshBasicMaterial({color})
+      const box1 = new Mesh(geometry, material)
+      scene.add(box1)
+      box1.position.x = x * GAP
+      box1.position.z = y * GAP
+      box1.name = `${x}-${y}`
+      box1.x = x
+      box1.y = y
+      if (!boxes[x]) boxes[x] = []
+      boxes[x][y] = box1
+    }
+  }
+
+  console.log('boxes: ', boxes)
 
   // Start animation
-  renderer.setAnimationLoop(function animate(time) {
-    cube.rotation.x = time / 10000;
-    cube.rotation.y = time / 10000;
+  function animate() {
+    requestAnimationFrame(animate);
     renderer.render(scene, camera);
-  });
+    css3DRenderer.render(scene, camera);
+    if(hoveredMesh && hoveredMesh.position)
+    hoveredMesh.position.y += 0.05
+    controls.update();
+  }
+
+  function onPointerMove(event) {
+    
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    // raycaster.layers.set(1)
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children);
+    console.log('intersects: ', intersects)
+    if(intersects.length > 0) {
+      hoveredMesh = intersects[0].object;
+      // console.log({
+      //   hovered: hoveredMesh,
+      //   hoveredMesh: boxes[hoveredMesh.x][hoveredMesh.y]
+      // })
+    }
+  }
+  
+  window.addEventListener( 'pointermove', onPointerMove );
+
+  animate();
 }
 
 function createScene() {
   const scene = new Scene();
-  scene.background = new Color("skyblue");
 
   const camera = new PerspectiveCamera(
     75,
@@ -48,15 +105,23 @@ function createScene() {
   const renderer = new WebGLRenderer({ antialias: true, canvas });
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const css3DRenderer = new CSS3DRenderer();
+  css3DRenderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("css3d").appendChild(css3DRenderer.domElement);
 
-  camera.position.z = 5;
+  const controls = new OrbitControls(camera, css3DRenderer.domElement);
+
+  camera.position.z = 40;
+  camera.position.y = 5
+  camera.rotateX(Math.PI / 6)
   controls.update();
 
   return {
     scene,
     camera,
+    controls,
     renderer,
+    css3DRenderer,
   };
 }
 
@@ -71,5 +136,8 @@ function createLight() {
     hLight,
   };
 }
+
+
+
 
 main();
