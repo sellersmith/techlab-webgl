@@ -13,7 +13,7 @@ const startPoint = { x: 1, y: 1 };
 const answer = solve(startPoint, matrix);
 console.log({ answer });
 
-function solve(point, matrix) {
+export function solve(point, matrix) {
   const answer = [];
   const visited = new Set();
   visited.add(`${point.x},${point.y}`);
