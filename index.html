@@ -4,33 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-			body { margin: 0; }
-		</style>
     <title>Threejs Starter</title>
   </head>
   <body>
-    <!-- <image id="myImage"  src="/checker.png" /> -->
-      <div style="display: flex;">
-        <div id="canvasContainer" style="width: 80vw; height: 100vh;">
-          <canvas id="threejsCanvas"/>
-        </div>
-        <div style="display: flex; flex-direction: column;">
-          <label for="color">Color</label>
-          <input type="color" name="color">
-          <label for="front-top">Front Text</label>
-          <input name="front-top">
-          <label for="offset-top">Offset Top</label>
-          <input name="offset-top" type="range" min="0" max="100" value="40">
-          <label for="offset-left">Offset Left</label>
-          <input name="offset-left" type="range" min="0" max="100" value="50">
-        
-          <label for="rect-offset-top">Rect Offset Top</label>
-          <input name="rect-offset-top" type="range" min="0" max="100" value="40">
-          <label for="rect-offset-left">Rect Offset Left</label>
-          <input name="rect-offset-left" type="range" min="0" max="100" value="50">
-        </div>
-      </div>
-    <script type="module" src="/main.js"></script>
+    <div id="container">
+      <canvas id="webgl" width="800" height="800"></canvas>
+    </div>
+    <script type="module" src="/main2.js"></script>
   </body>
 </html>
