@@ -1,21 +1,47 @@
-import React, { useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef, useState, Suspense } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useGLTF, Environment, useTexture, Decal } from "@react-three/drei";
 
 function App() {
   return (
     <Canvas>
-      <ambientLight intensity={Math.PI / 2} />
-      <spotLight
-        position={[10, 10, 10]}
-        angle={0.15}
-        penumbra={1}
-        decay={0}
-        intensity={Math.PI}
-      />
-      <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-      <Box position={[-1.2, 0, 0]} />
-      <Box position={[1.2, 0, 0]} />
+      <Suspense fallback={null}>
+        <Model />
+        <Environment preset="sunset" background />
+      </Suspense>
     </Canvas>
+  );
+}
+
+function Model(props) {
+  const meshRef = useRef();
+  const { viewport } = useThree();
+  const { nodes, materials } = useGLTF("/tshirt5.glb");
+  const texture = useTexture(`/pagefly.jpeg`);
+  useFrame((state, delta, xrFrame) => {
+    const mouse = state.pointer
+    const z = (mouse.x * viewport.width) / 2
+    meshRef.current.rotation.set(meshRef.current.rotation.x, z , meshRef.current.rotation.z)
+  }
+  )
+
+  console.log({
+    nodes,
+    materials
+  })
+  return (
+    <group {...props} dispose={null}>
+      <mesh
+        scale={1}
+        rotation={[0, 0, 0]}
+        ref={meshRef}
+        castShadow
+        receiveShadow
+        geometry={nodes["Male_Tshirt"].geometry} material={materials['lambert.002']}
+      >
+        <Decal debug position={[0, 1, 0.15]} rotation={[0, 0, 0]} scale={1.5} map={texture}  />
+      </mesh>
+    </group>
   );
 }
 
@@ -42,5 +68,7 @@ function Box(props) {
     </mesh>
   );
 }
+
+["/vibe.webp", "/pagefly.jpeg", "/checkmate.webp", '/three2.png'].forEach(useTexture.preload);
 
 export default App;
