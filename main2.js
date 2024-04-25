@@ -77,17 +77,20 @@ let targetCube
 // Utilities functions
 //
 function moveCubes() {
-  let needLower = true
+
   if (targetCube) {
     // targetCube.object.material.color.set(0xff0000);
     const { x: targetX, y: targetY } = targetCube.object.position
+    
     for (let cube of cubes) {
       const { x, y } = cube.position
       const distanceX = (MAX_DISTANCE - Math.min(Math.abs(x - targetX), MAX_DISTANCE))
       const distanceY = (MAX_DISTANCE - Math.min(Math.abs(y - targetY), MAX_DISTANCE))
-
       const moveDistance = distanceX / 2
+      
       if (distanceX > 0 && cube.position.z < moveDistance) {
+        // (DISTANCE_PER_FRAME / (1 / moveDistance))
+        // The closer to the target, the faster move speed
         cube.position.z = Math.min(cube.position.z + DISTANCE_PER_FRAME, moveDistance)
       } else if (cube.position.z > 0) {
         cube.position.z = Math.max(cube.position.z - DISTANCE_PER_FRAME, 0)
@@ -105,9 +108,9 @@ function createCubes(scene) {
   for (let x = 0; x < 20; x++) {
     for (let y = 0; y < 20; y++) {
 
-      const R = hex(12 * x + 15)
+      const R = hex(10 * x + 55)
       const G = '00'
-      const B = hex(12 * y + 15)
+      const B = hex(10 * y + 55)
       
       const geometry = new THREE.BoxGeometry(1, 1, 2);
       // const geometry = new THREE.SphereGeometry(0.8, 32, 16);
