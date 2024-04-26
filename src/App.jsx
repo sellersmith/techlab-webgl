@@ -25,6 +25,7 @@ function Model(props) {
   const modelURL = "/tshirt5.glb";
   const snap = useSnapshot(state);
   const meshRef = useRef();
+  const groupRef = useRef();
   const { viewport } = useThree();
   const { nodes, materials } = useGLTF(modelURL);
   const texture = useTexture(
@@ -33,10 +34,17 @@ function Model(props) {
 
   useFrame((state, delta, xrFrame) => {
     const mouse = state.pointer;
-    const z = (mouse.x * viewport.width) / 2;
+    const groupY = (mouse.x * viewport.width) / 2;
+    groupRef.current.rotation.set(
+      groupRef.current.rotation.x,
+      groupY,
+      groupRef.current.rotation.z,
+    )
+
+    const meshY = meshRef.current.rotation.y + 0.01;
     meshRef.current.rotation.set(
       meshRef.current.rotation.x,
-      z,
+      meshY,
       meshRef.current.rotation.z
     );
     easing.dampC(
@@ -52,7 +60,7 @@ function Model(props) {
     materials,
   });
   return (
-    <group {...props} dispose={null}>
+    <group ref={groupRef} {...props} dispose={null}>
       <mesh
         scale={1}
         rotation={[0, 0, 0]}
