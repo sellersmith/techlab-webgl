@@ -65,6 +65,8 @@ function Model(props) {
     materials,
   });
 
+  const [decalPosition, setDecalPosition] = useState([0, 1, 0.15]);
+
   return (
     <group ref={groupRef} {...props} dispose={null}>
       <mesh
@@ -84,13 +86,12 @@ function Model(props) {
         onPointerMove={(e) => {
           if (!meshPointerEnter) return;
           const { x, y, z } = e.point;
-          decalRef.current.position.x = x;
-          decalRef.current.position.y = y - 1;
+          setDecalPosition([x, y, decalPosition[2]]);
         }}
       >
         <Decal
           ref={decalRef}
-          position={[0, 1, 0.15]}
+          position={decalPosition}
           rotation={[0, 0, 0]}
           scale={1}
           map={texture}
