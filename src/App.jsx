@@ -1,23 +1,23 @@
 import React, { useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, useTexture, Decal } from "@react-three/drei";
-import { Overlay } from './components'
+import { Overlay } from "./components";
 import { useSnapshot } from "valtio";
 import { state } from "./store";
 import { easing } from "maath";
 import MODAl_CONFIGS from "./modelConfigs";
-
+import { DragImage } from "./components/DragImage";
 function App() {
   return (
-    <>
-    <Canvas>
-      <Suspense fallback={null}>
-        <Model />
-        <Environment preset="sunset" background />
-      </Suspense>
-    </Canvas>
-    <Overlay/>
-    </>
+    <DragImage>
+      <Canvas>
+        <Suspense fallback={null}>
+          <Model />
+          <Environment preset="sunset" background />
+        </Suspense>
+      </Canvas>
+      <Overlay />
+    </DragImage>
   );
 }
 
@@ -29,7 +29,9 @@ function Model(props) {
   const { viewport } = useThree();
   const { nodes, materials } = useGLTF(modelURL);
   const texture = useTexture(
-    `/${snap.decal}.${snap.decal === "pagefly" ? "png" : "webp"}`
+    snap.decal.includes("base64")
+      ? snap.decal
+      : `/${snap.decal}.${snap.decal === "pagefly" ? "png" : "webp"}`
   );
 
   useFrame((state, delta, xrFrame) => {
@@ -38,8 +40,8 @@ function Model(props) {
     groupRef.current.rotation.set(
       groupRef.current.rotation.x,
       groupY,
-      groupRef.current.rotation.z,
-    )
+      groupRef.current.rotation.z
+    );
 
     const meshY = meshRef.current.rotation.y + 0.01;
     meshRef.current.rotation.set(

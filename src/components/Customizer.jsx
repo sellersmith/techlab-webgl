@@ -24,7 +24,11 @@ export function Customizer() {
               onClick={() => (state.decal = decal)}
             >
               <img
-                src={decal + `${decal === "pagefly" ? ".png" : ".webp"}`}
+                src={
+                  decal.includes("base64")
+                    ? decal
+                    : decal + `${decal === "pagefly" ? ".png" : ".webp"}`
+                }
                 alt="brand"
               />
             </div>
