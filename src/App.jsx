@@ -1,6 +1,6 @@
 import React, { useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment, useTexture, Decal } from "@react-three/drei";
+import { useGLTF, useTexture, AccumulativeShadows, RandomizedLight, Decal, Environment, Center } from '@react-three/drei'
 import { Overlay } from "./components";
 import { useSnapshot } from "valtio";
 import { state } from "./store";
@@ -13,12 +13,24 @@ function App() {
       <Canvas gl={{ preserveDrawingBuffer: true }}>
         <Suspense fallback={null}>
           <Model />
-          <Environment preset="sunset" background />
+          <Environment preset="sunset" />
+          <Backdrop />
         </Suspense>
       </Canvas>
       <Overlay />
     </DragImage>
   );
+}
+
+function Backdrop() {
+  const shadows = useRef()
+  useFrame((state, delta) => easing.dampC(shadows.current.getMesh().material.color, state.color, 0.25, delta))
+  return (
+    <AccumulativeShadows ref={shadows} temporal frames={60} alphaTest={1} scale={10} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -1]}>
+      <RandomizedLight amount={4} radius={9} intensity={0.55} ambient={0.25} position={[5, 5, -10]} />
+      <RandomizedLight amount={4} radius={5} intensity={0.25} ambient={0.55} position={[-5, 5, -9]} />
+    </AccumulativeShadows>
+  )
 }
 
 function Model(props) {
@@ -42,11 +54,11 @@ function Model(props) {
   useFrame((state, delta, xrFrame) => {
     const mouse = state.pointer;
     const groupY = (mouse.x * viewport.width) / 2;
-    // groupRef.current.rotation.set(
-    //   groupRef.current.rotation.x,
-    //   groupY,
-    //   groupRef.current.rotation.z
-    // );
+    groupRef.current.rotation.set(
+      groupRef.current.rotation.x,
+      groupY,
+      groupRef.current.rotation.z
+    );
 
     // const meshY = meshRef.current.rotation.y + 0.01;
     // meshRef.current.rotation.set(
@@ -74,6 +86,7 @@ function Model(props) {
       <mesh
         scale={1}
         rotation={[0, 0, 0]}
+        position={[0, 0, 0]}
         ref={meshRef}
         castShadow
         receiveShadow
