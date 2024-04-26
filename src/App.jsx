@@ -46,12 +46,12 @@ function Model(props) {
     //   groupRef.current.rotation.z
     // );
 
-    // const meshY = meshRef.current.rotation.y + 0.01;
-    // meshRef.current.rotation.set(
-    //   meshRef.current.rotation.x,
-    //   meshY,
-    //   meshRef.current.rotation.z
-    // );
+    const meshY = meshRef.current.rotation.y + 0.01;
+    meshRef.current.rotation.set(
+      meshRef.current.rotation.x,
+      meshY,
+      meshRef.current.rotation.z
+    );
     easing.dampC(
       materials[MODAl_CONFIGS[modelURL].material].color,
       snap.color,
