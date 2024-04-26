@@ -26,6 +26,7 @@ function Model(props) {
   const snap = useSnapshot(state);
   const meshRef = useRef();
   const groupRef = useRef();
+  const decalRef = useRef();
   const { viewport } = useThree();
   const { nodes, materials } = useGLTF(modelURL);
   const texture = useTexture(
@@ -34,21 +35,23 @@ function Model(props) {
       : `/${snap.decal}.${snap.decal === "pagefly" ? "png" : "webp"}`
   );
 
+  const [meshPointerEnter, setMeshPointerEnter] = useState(false);
+
   useFrame((state, delta, xrFrame) => {
     const mouse = state.pointer;
     const groupY = (mouse.x * viewport.width) / 2;
-    groupRef.current.rotation.set(
-      groupRef.current.rotation.x,
-      groupY,
-      groupRef.current.rotation.z
-    );
+    // groupRef.current.rotation.set(
+    //   groupRef.current.rotation.x,
+    //   groupY,
+    //   groupRef.current.rotation.z
+    // );
 
-    const meshY = meshRef.current.rotation.y + 0.01;
-    meshRef.current.rotation.set(
-      meshRef.current.rotation.x,
-      meshY,
-      meshRef.current.rotation.z
-    );
+    // const meshY = meshRef.current.rotation.y + 0.01;
+    // meshRef.current.rotation.set(
+    //   meshRef.current.rotation.x,
+    //   meshY,
+    //   meshRef.current.rotation.z
+    // );
     easing.dampC(
       materials[MODAl_CONFIGS[modelURL].material].color,
       snap.color,
@@ -61,6 +64,7 @@ function Model(props) {
     nodes,
     materials,
   });
+
   return (
     <group ref={groupRef} {...props} dispose={null}>
       <mesh
@@ -71,12 +75,28 @@ function Model(props) {
         receiveShadow
         geometry={nodes[MODAl_CONFIGS[modelURL].geometry].geometry}
         material={materials[MODAl_CONFIGS[modelURL].material]}
+        onPointerDown={(e) => {
+          setMeshPointerEnter(true);
+        }}
+        onPointerUp={(e) => {
+          setMeshPointerEnter(false);
+        }}
+        onPointerMove={(e) => {
+          if (!meshPointerEnter) return;
+          const { x, y, z } = e.point;
+          decalRef.current.position.x = x;
+          decalRef.current.position.y = y - 1;
+        }}
       >
         <Decal
+          ref={decalRef}
           position={[0, 1, 0.15]}
           rotation={[0, 0, 0]}
           scale={1}
           map={texture}
+          onPointerDown={(e) => {
+            console.log("e", e);
+          }}
         />
       </mesh>
     </group>
