@@ -4,7 +4,6 @@ import { Logo } from "@pmndrs/branding";
 import { motion } from "framer-motion";
 import { state } from "../store";
 
-
 export function Overlay() {
   const snap = useSnapshot(state);
   const transition = { type: "spring", duration: 0.8 };

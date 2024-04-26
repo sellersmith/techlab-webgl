@@ -10,7 +10,7 @@ import { DragImage } from "./components/DragImage";
 function App() {
   return (
     <DragImage>
-      <Canvas>
+      <Canvas gl={{ preserveDrawingBuffer: true }}>
         <Suspense fallback={null}>
           <Model />
           <Environment preset="sunset" background />
