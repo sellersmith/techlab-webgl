@@ -1,6 +1,10 @@
 import React, { useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, useTexture, Decal } from "@react-three/drei";
+import { useSnapshot } from 'valtio'
+import { state } from "./store";
+
+import { easing } from 'maath'
 
 function App() {
   return (
@@ -14,14 +18,19 @@ function App() {
 }
 
 function Model(props) {
+  const snap = useSnapshot(state)
+
+  console.log('snap: ', snap.color)
   const meshRef = useRef();
   const { viewport } = useThree();
   const { nodes, materials } = useGLTF("/tshirt5.glb");
-  const texture = useTexture(`/pagefly.jpeg`);
+  const texture = useTexture(`/${snap.decal}.${snap.decal === 'pagefly' ? 'png' : 'webp'}`);
+
   useFrame((state, delta, xrFrame) => {
     const mouse = state.pointer
     const z = (mouse.x * viewport.width) / 2
     meshRef.current.rotation.set(meshRef.current.rotation.x, z , meshRef.current.rotation.z)
+    easing.dampC(materials["lambert1.002"].color, snap.color, 0.25, delta)
   }
   )
 
@@ -37,9 +46,9 @@ function Model(props) {
         ref={meshRef}
         castShadow
         receiveShadow
-        geometry={nodes["Male_Tshirt"].geometry} material={materials['lambert.002']}
+        geometry={nodes["Male_Tshirt"].geometry} material={materials['lambert1.002']}
       >
-        <Decal debug position={[0, 1, 0.15]} rotation={[0, 0, 0]} scale={1.5} map={texture}  />
+        <Decal debug position={[0, 1, 0.15]} rotation={[0, 0, 0]} scale={1} map={texture}  />
       </mesh>
     </group>
   );
@@ -69,6 +78,6 @@ function Box(props) {
   );
 }
 
-["/vibe.webp", "/pagefly.jpeg", "/checkmate.webp", '/three2.png'].forEach(useTexture.preload);
+["/vibe.webp", "/pagefly.png", "/checkmate.webp"].forEach(useTexture.preload);
 
 export default App;
