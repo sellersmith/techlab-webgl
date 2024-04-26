@@ -35,6 +35,8 @@ function Model(props) {
       : `/${snap.decal}.${snap.decal === "pagefly" ? "png" : "webp"}`
   );
 
+  const textTexture = useTexture(convertTextToImageBase64("Hello World"));
+
   const [meshPointerEnter, setMeshPointerEnter] = useState(false);
 
   useFrame((state, delta, xrFrame) => {
@@ -46,12 +48,12 @@ function Model(props) {
     //   groupRef.current.rotation.z
     // );
 
-    const meshY = meshRef.current.rotation.y + 0.01;
-    meshRef.current.rotation.set(
-      meshRef.current.rotation.x,
-      meshY,
-      meshRef.current.rotation.z
-    );
+    // const meshY = meshRef.current.rotation.y + 0.01;
+    // meshRef.current.rotation.set(
+    //   meshRef.current.rotation.x,
+    //   meshY,
+    //   meshRef.current.rotation.z
+    // );
     easing.dampC(
       materials[MODAl_CONFIGS[modelURL].material].color,
       snap.color,
@@ -66,7 +68,7 @@ function Model(props) {
   });
 
   const [decalPosition, setDecalPosition] = useState([0, 1, 0.15]);
-
+  console.log(convertTextToImageBase64("Hello world"));
   return (
     <group ref={groupRef} {...props} dispose={null}>
       <mesh
@@ -99,6 +101,16 @@ function Model(props) {
             console.log("e", e);
           }}
         />
+        <Decal
+          ref={decalRef}
+          position={decalPosition}
+          rotation={[0, 0, 0]}
+          scale={1}
+          map={textTexture}
+          onPointerDown={(e) => {
+            console.log("e", e);
+          }}
+        />
       </mesh>
     </group>
   );
@@ -107,3 +119,22 @@ function Model(props) {
 ["/vibe.webp", "/pagefly.png", "/checkmate.webp"].forEach(useTexture.preload);
 
 export default App;
+
+function convertTextToImageBase64(text) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  // Set font and style
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "black";
+
+  const textWidth = ctx.measureText(text).width;
+
+  // Draw the text
+  ctx.fillText(text, 20, 40);
+
+  // Get base64 encoded image data (including data URI prefix)
+  const imageData = canvas.toDataURL("image/png");
+
+  return imageData;
+}
